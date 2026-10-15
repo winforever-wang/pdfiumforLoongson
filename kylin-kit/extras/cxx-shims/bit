@@ -1,0 +1,22 @@
+// PDFium Kylin kit: minimal C++20 <bit> replacement for the GCC 8 libstdc++
+// in this sysroot. Most consumers guard <bit> usage behind __cpp_lib_*
+// feature-test macros (abseil bits.h, absl/base/casts.h, dragonbox,
+// fast_float), which are inactive here; std::has_single_bit covers
+// fx_memory.cpp under DCHECK_IS_ON(). Header-only; no new runtime symbols.
+
+#ifndef PDFIUM_KIT_COMPAT_BIT_H_
+#define PDFIUM_KIT_COMPAT_BIT_H_
+
+#include <type_traits>
+
+namespace std {
+
+template <typename T>
+constexpr bool has_single_bit(T x) noexcept {
+  static_assert(std::is_unsigned_v<T>, "unsigned only");
+  return x != 0 && (x & (x - 1)) == 0;
+}
+
+}  // namespace std
+
+#endif  // PDFIUM_KIT_COMPAT_BIT_H_

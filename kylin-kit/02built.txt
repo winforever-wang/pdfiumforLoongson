@@ -1,0 +1,200 @@
+==> gn gen...
+    从源码编译 gn (使用 kit 中的 gn-src.tar.xz) ...
+    运行 gen.py (生成 build.ninja) ...
+    编译 gn (ninja)...
+clang++ -MMD -MF src/gn/input_conversion.o.d -I../src -I. -DNDEBUG -O3 -fdata-sections -ffunction-sections -D_FILE_OFFSET_BITS=64 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -pthread -pipe -fno-exceptions -fno-rtti -fdiagnostics-color -Wall -Wextra -Wno-unused-parameter -Wextra-semi -Wundef -std=c++17 -Wrange-loop-analysis -Wextra-semi-stmt -Wno-deprecated-copy -Wno-implicit-fallthrough -Wno-redundant-move -Wno-unused-variable -Wno-format -Wno-strict-aliasing -Wno-cast-function-type -c ../src/gn/input_conversion.cc -o src/gn/input_conversion.o
+../src/gn/input_conversion.cc:213:46: error: member reference base type 'const char [6]' is not a structure or union
+  if (input_conversion.compare(0, kTrimPrefix.size(), kTrimPrefix) == 0) {
+                                  ~~~~~~~~~~~^~~~~
+1 error generated.
+[110/302] CXX src/gn/item.o
+[111/302] CXX src/gn/invoke_python.o
+[112/302] CXX src/gn/import_manager.o
+[113/302] CXX src/gn/functions.o
+[114/302] CXX src/gn/label.o
+[115/302] CXX src/gn/label_pattern.o
+[116/302] CXX src/gn/input_file_manager.o
+[117/302] CXX src/gn/header_checker.o
+[118/302] CXX src/gn/json_project_writer.o
+ninja: build stopped: subcommand failed.
+    gn 编译未产出二进制
+总用量 308
+drwxr-xr-x  3 wang wang   4096 10月 10 20:55 .
+drwxrwxr-x 12 wang wang   4096 10月 10 20:55 ..
+-rw-rw-r--  1 wang wang  75512 10月 10 20:55 base.a
+-rw-r--r--  1 wang wang 171700 10月 10 20:55 build.ninja
+-rw-r--r--  1 wang wang     65 10月 10 20:55 build.ninja.d
+-rw-rw-r--  1 wang wang  37104 10月 10 20:55 .ninja_deps
+-rw-rw-r--  1 wang wang   7710 10月 10 20:55 .ninja_log
+drwxrwxr-x  4 wang wang   4096 10月 10 20:55 src
+==> gn 源码编译失败, 无法继续
+
+
+
+
+
+
+
+
+
+wang@inspur-pc:~/code/pdfium-main/kylin-kit$ cd ~/code/pdfium-main/kylin-kit && bash 02-build.sh 2>&1 | tee /tmp/02-build.log | tail -40
+==> gn gen...
+    从源码编译 gn (使用 kit 中的 gn-src.tar.xz) ...
+    运行 gen.py (生成 build.ninja) ...
+    编译 gn (ninja)...
+clang++ -MMD -MF src/gn/input_conversion.o.d -I../src -I. -DNDEBUG -O3 -fdata-sections -ffunction-sections -D_FILE_OFFSET_BITS=64 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -pthread -pipe -fno-exceptions -fno-rtti -fdiagnostics-color -Wall -Wextra -Wno-unused-parameter -Wextra-semi -Wundef -std=c++17 -Wrange-loop-analysis -Wextra-semi-stmt -Wno-deprecated-copy -Wno-implicit-fallthrough -Wno-redundant-move -Wno-unused-variable -Wno-format -Wno-strict-aliasing -Wno-cast-function-type -c ../src/gn/input_conversion.cc -o src/gn/input_conversion.o
+../src/gn/input_conversion.cc:213:46: error: member reference base type 'const char [6]' is not a structure or union
+  if (input_conversion.compare(0, kTrimPrefix.size(), kTrimPrefix) == 0) {
+                                  ~~~~~~~~~~~^~~~~
+1 error generated.
+[109/302] CXX src/gn/import_manager.o
+[110/302] CXX src/gn/desc_builder.o
+[111/302] CXX src/gn/item.o
+[112/302] CXX src/gn/functions.o
+[113/302] CXX src/gn/invoke_python.o
+[114/302] CXX src/gn/header_checker.o
+[115/302] CXX src/gn/input_file_manager.o
+[116/302] CXX src/gn/label.o
+[117/302] CXX src/gn/json_project_writer.o
+ninja: build stopped: subcommand failed.
+    gn 编译未产出二进制
+总用量 304
+drwxr-xr-x  3 wang wang   4096 10月 10 21:01 .
+drwxrwxr-x 12 wang wang   4096 10月 10 21:00 ..
+-rw-rw-r--  1 wang wang  75512 10月 10 21:01 base.a
+-rw-r--r--  1 wang wang 171700 10月 10 21:00 build.ninja
+-rw-r--r--  1 wang wang     65 10月 10 21:00 build.ninja.d
+-rw-rw-r--  1 wang wang  36812 10月 10 21:01 .ninja_deps
+-rw-rw-r--  1 wang wang   7643 10月 10 21:01 .ninja_log
+drwxrwxr-x  4 wang wang   4096 10月 10 21:00 src
+==> gn 源码编译失败, 无法继续
+wang@inspur-pc:~/code/pdfium-main/kylin-kit$ 
+
+
+
+
+
+
+wang@inspur-pc:~/code/pdfium-main/kylin-kit$ cd ~/code/pdfium-main/kylin-kit && bash 02-build.sh 2>&1 | tee /tmp/02-build.log | tail -20
+In file included from ../../core/fpdftext/cpdf_textpage.h:17:
+In file included from ../../core/fpdfapi/page/cpdf_pageobjectholder.h:23:
+In file included from ../../core/fpdfapi/parser/cpdf_dictionary.h:17:
+In file included from ../../core/fpdfapi/parser/cpdf_object.h:15:
+In file included from ../../core/fxcrt/fx_string.h:15:
+In file included from ../../core/fxcrt/bytestring.h:18:
+In file included from ../../core/fxcrt/fx_string_wrappers.h:11:
+In file included from ../../core/fxcrt/fx_memory_wrappers.h:12:
+../../core/fxcrt/fx_memory.h:35:1: warning: unknown attribute 'noinline' ignored [-Wunknown-attributes]
+NOINLINE void FX_OutOfMemoryTerminate(size_t size);
+^~~~~~~~
+../../core/fxcrt/compiler_specific.h:29:20: note: expanded from macro 'NOINLINE'
+#define NOINLINE [[clang::noinline]]
+                   ^~~~~~~~~~~~~~~
+3 warnings generated.
+ninja: build stopped: subcommand failed.
+
+real	1m35.011s
+user	11m50.467s
+sys	0m12.933s
+wang@inspur-pc:~/code/pdfium-main/kylin-kit$ 
+
+
+
+
+
+ang@inspur-pc:~/code/pdfium-main/kylin-kit$ ./fix-clang.sh 
+==> 修复 clang 包装器 (添加 system-include 路径)...
+==> 新 clang 包装器内容:
+#!/bin/bash
+export LD_LIBRARY_PATH="/home/wang/pdfium-kylin/clang13-root/usr/lib/loongarch64-linux-gnu:/home/wang/pdfium-kylin/clang13-root/usr/lib/llvm-13/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+exec "/home/wang/pdfium-kylin/clang13-root/usr/lib/llvm-13/bin/clang-13" -isystem "/home/wang/pdfium-kylin/system-include" "$@"
+==> 验证 jerror.h 可被找到:
+-rw-rw-r-- 1 wang wang 15088 10月 10 20:18 /home/wang/pdfium-kylin/system-include/jerror.h
+==> 完成。请重跑: cd ~/pdfium-kylin/pdfium-c13 && time ninja -C out/kylin obj/libpdfium.a 2>&1 | tee /tmp/ninja-build.log | tail -30
+wang@inspur-pc:~/code/pdfium-main/kylin-kit$ cat "$W/clang/bin/clang"
+#!/bin/bash
+export LD_LIBRARY_PATH="/home/wang/pdfium-kylin/clang13-root/usr/lib/loongarch64-linux-gnu:/home/wang/pdfium-kylin/clang13-root/usr/lib/llvm-13/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+exec "/home/wang/pdfium-kylin/clang13-root/usr/lib/llvm-13/bin/clang-13" -isystem "/home/wang/pdfium-kylin/system-include" "$@"
+wang@inspur-pc:~/code/pdfium-main/kylin-kit$ 
+wang@inspur-pc:~/code/pdfium-main/kylin-kit$ cd ~/pdfium-kylin/pdfium-c13 && time ninja -C out/kylin obj/libpdfium.a 2>&1 | tee /tmp/ninja-build.log | tail -30
+ninja：未找到命令
+
+real	0m0.065s
+user	0m0.054s
+sys	0m0.013s
+wang@inspur-pc:~/pdfium-kylin/pdfium-c13$ 
+
+
+
+
+
+
+
+
+
+
+
+
+wang@inspur-pc:~/pdfium-kylin/pdfium-c13$ export PATH=~/pdfium-kylin/clang/bin:~/pdfium-kylin/bin:$PATH && time ninja -C out/kylin obj/libpdfium.a 2>&1 | tee /tmp/ninja-build.log | tail -30
+2 warnings generated.
+[428/436] AR obj/third_party/icu/libicuuc.a
+FAILED: obj/third_party/icu/libicuuc.a 
+rm -f obj/third_party/icu/libicuuc.a && "/home/wang/pdfium-kylin/clang/bin/llvm-ar" -T -S -r -c -D obj/third_party/icu/libicuuc.a @"obj/third_party/icu/libicuuc.a.rsp"
+/home/wang/pdfium-kylin/clang/bin/llvm-ar: error while loading shared libraries: libLLVM-13.so.1: cannot open shared object file: No such file or directory
+[429/436] CC obj/third_party/zlib/zlib/gzwrite.o
+warning: unknown warning option '-Wno-thread-safety-reference-return'; did you mean '-Wno-thread-safety-reference'? [-Wunknown-warning-option]
+warning: unknown warning option '-Wno-uninitialized-const-pointer'; did you mean '-Wno-uninitialized-const-reference'? [-Wunknown-warning-option]
+2 warnings generated.
+[430/436] CC obj/third_party/zlib/zlib/inffast.o
+warning: unknown warning option '-Wno-thread-safety-reference-return'; did you mean '-Wno-thread-safety-reference'? [-Wunknown-warning-option]
+warning: unknown warning option '-Wno-uninitialized-const-pointer'; did you mean '-Wno-uninitialized-const-reference'? [-Wunknown-warning-option]
+2 warnings generated.
+[431/436] CC obj/third_party/zlib/zlib/infback.o
+warning: unknown warning option '-Wno-thread-safety-reference-return'; did you mean '-Wno-thread-safety-reference'? [-Wunknown-warning-option]
+warning: unknown warning option '-Wno-uninitialized-const-pointer'; did you mean '-Wno-uninitialized-const-reference'? [-Wunknown-warning-option]
+2 warnings generated.
+[432/436] CC obj/third_party/zlib/zlib/trees.o
+warning: unknown warning option '-Wno-thread-safety-reference-return'; did you mean '-Wno-thread-safety-reference'? [-Wunknown-warning-option]
+warning: unknown warning option '-Wno-uninitialized-const-pointer'; did you mean '-Wno-uninitialized-const-reference'? [-Wunknown-warning-option]
+2 warnings generated.
+[433/436] CC obj/third_party/zlib/zlib/deflate.o
+warning: unknown warning option '-Wno-thread-safety-reference-return'; did you mean '-Wno-thread-safety-reference'? [-Wunknown-warning-option]
+warning: unknown warning option '-Wno-uninitialized-const-pointer'; did you mean '-Wno-uninitialized-const-reference'? [-Wunknown-warning-option]
+2 warnings generated.
+[434/436] CC obj/third_party/zlib/zlib/inflate.o
+warning: unknown warning option '-Wno-thread-safety-reference-return'; did you mean '-Wno-thread-safety-reference'? [-Wunknown-warning-option]
+warning: unknown warning option '-Wno-uninitialized-const-pointer'; did you mean '-Wno-uninitialized-const-reference'? [-Wunknown-warning-option]
+2 warnings generated.
+ninja: build stopped: subcommand failed.
+
+real	1m18.492s
+user	9m50.523s
+sys	0m12.516s
+wang@inspur-pc:~/pdfium-kylin/pdfium-c13$ 
+
+
+
+
+
+
+wang@inspur-pc:~/pdfium-kylin/pdfium-c13$ cd ~/code/pdfium-main/kylin-kit && bash 02-build.sh 2>&1 | tee /tmp/02-build.log | tail -30
+==> gn gen...
+Done. Made 510 targets from 133 files in 173ms
+==> 编译 (8 核约 20~60 分钟; 中断后重跑本脚本会增量续编)...
+ninja: Entering directory `out/kylin'
+[1/3] AR obj/third_party/zlib/libchrome_zlib.a
+[2/3] AR obj/third_party/icu/libicuuc.a
+[3/3] AR obj/libpdfium.a
+
+real	0m0.145s
+user	0m0.111s
+sys	0m0.047s
+==> 链接 libpdfium.so...
+    使用系统 libjpeg: /usr/lib/loongarch64-linux-gnu/libjpeg.so.62
+clang: warning: argument unused during compilation: '-nostdinc++' [-Wunused-command-line-argument]
+-rwxrwxr-x 1 wang wang 10048512 10月 10 21:37 out/kylin/final/libpdfium.so
+==> 编译完成。下一步: bash 03-verify.sh
+wang@inspur-pc:~/code/pdfium-main/kylin-kit$ 
+
+
+

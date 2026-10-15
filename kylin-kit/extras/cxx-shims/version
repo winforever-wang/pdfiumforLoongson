@@ -1,0 +1,4 @@
+#pragma once
+// Shim for GCC8 libstdc++: <version> first appeared in GCC 9.
+// Deliberately empty: undefined feature-test macros make third-party
+// code take its own fallback paths.

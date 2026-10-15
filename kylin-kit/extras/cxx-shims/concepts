@@ -1,0 +1,124 @@
+// PDFium Kylin kit: minimal C++20 <concepts> replacement for the GCC 8
+// libstdc++ in this sysroot. Header-only; introduces no runtime symbols and
+// keeps the target's libstdc++.so.6 ABI intact. Also provides the GCC 9/10
+// <type_traits> additions (type_identity, remove_cvref, is_constant_evaluated)
+// that PDFium uses after including <concepts>. Feature-test macros
+// (__cpp_lib_concepts etc.) are deliberately left undefined so third-party
+// code takes its own fallback paths.
+
+#ifndef PDFIUM_KIT_COMPAT_CONCEPTS_H_
+#define PDFIUM_KIT_COMPAT_CONCEPTS_H_
+
+#include <cstddef>
+#include <iterator>
+#include <type_traits>
+#include <utility>
+
+namespace std {
+
+// ---- <type_traits> additions (GCC 9/10) ----
+template <typename T>
+struct type_identity {
+  using type = T;
+};
+
+template <typename T>
+using type_identity_t = typename type_identity<T>::type;
+
+template <typename T>
+struct remove_cvref {
+  using type = remove_cv_t<remove_reference_t<T>>;
+};
+
+template <typename T>
+using remove_cvref_t = typename remove_cvref<T>::type;
+
+constexpr bool is_constant_evaluated() noexcept {
+  return __builtin_is_constant_evaluated();
+}
+
+// ---- core language concepts ----
+template <typename T, typename U>
+concept same_as = is_same_v<T, U> && is_same_v<U, T>;
+
+template <typename From, typename To>
+concept convertible_to =
+    is_convertible_v<From, To> &&
+    requires { static_cast<To>(declval<From>()); };
+
+template <typename T>
+concept integral = is_integral_v<T>;
+
+template <typename T>
+concept signed_integral = integral<T> && is_signed_v<T>;
+
+template <typename T>
+concept unsigned_integral = integral<T> && !is_signed_v<T>;
+
+template <typename T>
+concept floating_point = is_floating_point_v<T>;
+
+template <typename T, typename... Args>
+concept constructible_from = is_constructible_v<T, Args...>;
+
+template <typename T>
+concept equality_comparable =
+    requires(const remove_reference_t<T>& a, const remove_reference_t<T>& b) {
+      { a == b } -> same_as<bool>;
+      { a != b } -> same_as<bool>;
+    };
+
+template <typename T, typename U>
+concept equality_comparable_with =
+    requires(const remove_reference_t<T>& a, const remove_reference_t<U>& b) {
+      { a == b } -> same_as<bool>;
+      { a != b } -> same_as<bool>;
+      { b == a } -> same_as<bool>;
+      { b != a } -> same_as<bool>;
+    };
+
+// PDFium core never instantiates three-way comparisons; these minimal forms
+// only need to make the requires-clauses on span's operators well-formed.
+template <typename T>
+concept three_way_comparable =
+    requires(const remove_reference_t<T>& a, const remove_reference_t<T>& b) {
+      { a <=> b };
+    };
+
+template <typename T, typename U>
+concept three_way_comparable_with =
+    requires(const remove_reference_t<T>& a, const remove_reference_t<U>& b) {
+      { a <=> b };
+    };
+
+// span.h's operator<=> bodies name this C++20 algorithm but the operators are
+// never odr-used by PDFium core; a declaration (no <compare> in GCC 8)
+// suffices for definition-time name lookup.
+template <typename I1, typename I2>
+constexpr auto lexicographical_compare_three_way(I1 f1, I1 l1, I2 f2, I2 l2);
+
+// ---- iterator concepts (GCC 9/10 additions used by span.h) ----
+template <typename It>
+using iter_reference_t = decltype(*declval<It&>());
+
+template <typename It>
+using iter_difference_t =
+    typename iterator_traits<remove_cvref_t<It>>::difference_type;
+
+template <typename It, typename Sentinel>
+concept sized_sentinel_for =
+    requires(const It& i, const Sentinel& s) {
+      { s - i } -> same_as<iter_difference_t<It>>;
+      { i - s } -> same_as<iter_difference_t<It>>;
+    };
+
+template <typename It>
+concept contiguous_iterator =
+    is_pointer_v<It> ||
+    (requires { typename iterator_traits<It>::iterator_category; } &&
+     is_base_of_v<random_access_iterator_tag,
+                  typename iterator_traits<It>::iterator_category>);
+
+}  // namespace std
+
+#endif  // PDFIUM_KIT_COMPAT_CONCEPTS_H_

@@ -1,0 +1,76 @@
+#### ASSISTANT (521 chars)
+情况已经摸清，先同步几个关键事实，再确认几个决定方案的问题：
+
+**已确认的情况**
+- 这份源码是 [pdfium](https://github.com/chromium/pdfium)（GitHub 镜像分支，2025-11 版本），third_party 大部分依赖已随包附带，但缺最关键的 Chromium `build/` 构建仓库（DEPS 固定在 `chromium.googlesource.com`，commit `371ecb08`）
+- 本机访问不了 googlesource.com（gclient sync 会失败），github.com 可以访问；本地有 WSL2（openEuler 24.03 / ubuntu），无 Docker
+- 龙芯官方交叉工具链在 [loongson/build-tools](https://github.com/loongson/build-tools)（GitHub 可下载）
+- 源码树里没有任何 loongarch/mips 平台代码——平台支持全在未检出的 `build/` 里，需要确认该版本是否支持 loong64 目标，必要时打补丁
+
+在开始前有几个问题需要确认。
+
+#### ASSISTANT (219 chars)
+明确了：目标是 **LoongArch64（3A5000/3A6000）+ 麒麟桌面 V10**，产出 **libpdfium.so**，采用**目标机原生编译**。我来准备一套可直接在麒麟机上执行的构建方案（脚本 + 依赖包 + 补丁说明）。
+
+先建立任务清单，然后并行推进：探测本机网络（有没有可用代理/镜像源）、分析 DEPS 缺哪些依赖、调研上游 build 仓库的 loong64 支持和麒麟 loongarch 的工具链情况。
+
+#### ASSISTANT (278 chars)
+收到，目标机是 **LoongArch64 + 内核 5.4.18**，gcc 是 **8.3.0**（Loongnix 打包）。这个版本是硬约束：pdfium 这一代源码要求 **C++20**（build 体系里 `assert_cpp20_default = true`），gcc 8.3 支持不完整，基本确定要用 **Loongson 的 LLVM/clang 或仓库里的新版编译器**。所以下一步需要先摸清目标机上有什么可用的。
+
+我先把一份目标机体检脚本放进工作区，你拷到麒麟机上跑一次、把输出贴回来即可（一次性收集所有判断依据，不用来回问）。
+
+#### ASSISTANT (365 chars)
+体检脚本已就位：`E:\ai\pdfium-main\kylin-kit\inspect_target.sh`。
+
+**请在麒麟机上执行：**
+```bash
+bash inspect_target.sh > result.txt 2>&1
+```
+然后把 `result.txt` 内容发给我。脚本只读不写，主要确认：有没有新版 clang/gcc 可用、gn/ninja 有没有装、目标机网络能到哪些源（github/gitee/loongnix）、内存磁盘够不够。
+
+我这边继续准备依赖侧的工作：先把 chromium GitHub 镜像按源码固定日期（2025-11-19）浅克隆下来，验证 `build/`、`buildtools/`、`zlib`、`icu`、`freetype` 等缺失依赖能不能从镜像树里一次取齐。
+
+#### ASSISTANT (754 chars)
+两个调研 agent 都回来了，结论关键：
+
+- **build/ 体系无需为 loong64 打补丁**：pdfium 固定的 build@371ecb08 自带 `clang_loong64`/`gcc_toolchain("loong64")` 工具链，`target_cpu="loong64"` 自动选中；缺的只是 sysroot（用 `target_sysroot` GN 参数外接，不用改 build/）。
+- **麒麟桌面 V10 = 旧世界（glibc 2.28）**：需要 Loongson 补丁里的旧世界差异（`-mcmodel=large` + 旧世界 sysroot），来源是 github.com/loongson/chromium 的 loongarch-patches 分支。
+- **gcc 8.3 路线判死**：这个版本的 build/ 只支持源码编 libc++（`use_custom_libcxx` 已强制），clang 是唯一编译器选项；目标机上需自备原生 clang（Loongnix 20 有 clang 13.0.1，glibc 2.28 匹配，可作自举起点）。
+- gn 无 loong64 现成二进制，需从 github.com/openharmony/third_party_gn 源码自编。
+- 好消息：华为云镜像 chromium-browser-official 返回 200——官方源码 tar 包一次含 build/、buildtools/、icu、freetype、libjpeg-turbo、libc++ 全部缺失依赖。
+
+先核对华为云有没有同版本（14x）的 tar 包，以及 Loongson 补丁包里旧世界 sysroot 的位置。
+
+#### ASSISTANT (452 chars)
+体检结果非常关键，信息全齐了：
+
+- **glibc 2.28 = 旧世界**（与调研一致），GN 参数必须按旧世界配置（`-mcmodel=large` + 旧世界 sysroot）
+- **clang 8.0.1 / gcc 8.3 都编不了 2025 年的 pdfium**（需 C++20 + 较新 clang），但机器上有 apt、15G 内存、8 核、300G 硬盘，条件足够装/跑新工具链
+- 目标机 github.com 通、gitee 通，googlesource/loongnix gitlab 不通——** kit 必须带全所有源码，目标机零下载**
+- ninja/gn/cmake/git 都没有 → kit 里带
+
+现在并行核实三个下载源：华为云的 chromium 源码包（一次取齐 build/、icu、freetype、libc++ 等全部缺失依赖）、Loongson 补丁仓库的目录结构、Loongnix 20 的 clang 13 deb（旧世界兼容的原生编译器）。
+
+#### ASSISTANT (440 chars)
+三大关键源全部打通：
+
+- **华为云直链 200**：`chromium-143.0.7499.0.tar.xz` 存在——正是 pdfium 固定依赖（2025-11-12/19）的同期版本，官方 tar 包内含 build/、buildtools/、libc++、icu、freetype、libjpeg-turbo 全部缺失依赖
+- **Loongson 补丁仓库给出旧世界 sysroot 直链**：`debian_bullseye_loong64-sysroot.tar.bz2`（旧世界）+ 交叉 LLVM 20（debian-10 宿主 = glibc 2.28，正好匹配旧世界）
+- DEPS 路径确认：freetype2 → `third_party/freetype/src`、icu → `third_party/icu` 等，tar 包解压后目录完全对位
+
+现在确认磁盘空间、下载可达性，并克隆 Loongson 补丁分支（看有没有 143 对应版本）。
+
+#### ASSISTANT (233 chars)
+全部就绪：E 盘 182G 空闲、sysroot（130MB）和交叉 LLVM20（706MB）直链可达、Loongnix clang-13 deb 在列、Loongson 补丁分支有 chromium144（离 143 最近的版本，取其 build/ 相关补丁适配）。
+
+开始后台下载四大件：chromium 143 源码包（华为云）、旧世界 sysroot、交叉 LLVM20（用于本机 WSL 先验证整条流水线）、clang-13 deb（目标机原生编译器）。
+
+#### ASSISTANT (228 chars)
+进展良好：LLVM20 跨编译工具链已下到 92%（653/706MB）；Loongnix 25 的 chromium 138 源码包确认存在且是真实文件（965MB）；GitHub 143 标签镜像里 build/ 目录内容完整（GN 文件真实），但 third_party/icu 依赖源不在镜像里。接下来测 pkg.loongnix.cn 的下载速度、给 WSL 装编译工具、并确认 pdfium zip 里 third_party 的包装目录清单。
+
+#### ASSISTANT (201 chars)
+LLVM20 跨编译工具链下载完成；pkg.loongnix.cn 速度约 1.9MB/s（965MB 约 9 分钟）。pdfium zip 确认缺少全部 DEPS 依赖源（icu/zlib/abseil/libc++/libjpeg_turbo 等整个目录都没有）——正好由 chromium 138 源码包补齐。现在后台启动 138 源码包下载，同时下载 ninja deb 并校验已完成的两个包。
+
+#### ASSISTANT (207 chars)
+所有补丁点上下文已拿到。LLVM20 是 Debian 布局（`lib/clang/20/lib/linux/libclang_rt.builtins-loongarch64.a`），所以 clang/BUILD.gn 的 loong64 分支应设 `_dir="linux"` + `_suffix="-loongarch64"`。先备份原文件并确认 compiler/BUILD.gn 的 import 情况。
+
